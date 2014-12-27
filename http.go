@@ -5,13 +5,18 @@ import (
 	"net/http"
 )
 
-func New(staticdir string) http.Handler {
+type Storage struct {
+	Static string
+	Users  UserStore
+}
+
+func NewMux(s Storage) http.Handler {
 	mux := http.NewServeMux()
 
-	mux.Handle("/", http.FileServer(http.Dir(staticdir)))
+	mux.Handle("/", http.FileServer(http.Dir(s.Static)))
 
-	mux.HandleFunc("/api/game/new", newGameHandler)
-	mux.HandleFunc("/api/user/new", newUserHandler)
+	mux.HandleFunc("/api/game/new", s.newGame)
+	mux.HandleFunc("/api/user/new", s.newUser)
 
 	return mux
 }
@@ -36,7 +41,7 @@ func write(w http.ResponseWriter, r Response) {
 	w.Write([]byte("\n"))
 }
 
-func newGameHandler(w http.ResponseWriter, r *http.Request) {
+func (s Storage) newGame(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		write(w, errorResp(err))
@@ -45,7 +50,7 @@ func newGameHandler(w http.ResponseWriter, r *http.Request) {
 
 	var users []User
 	for _, name := range r.Form["user"] {
-		if u, ok := getUser(name); ok {
+		if u, err := s.Users.Get(name); err == nil {
 			users = append(users, u)
 		}
 	}
@@ -59,14 +64,14 @@ func newGameHandler(w http.ResponseWriter, r *http.Request) {
 	write(w, Response{Success: true, Result: game})
 }
 
-func newUserHandler(w http.ResponseWriter, r *http.Request) {
+func (s Storage) newUser(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		write(w, errorResp(err))
 		return
 	}
 
-	user, err := createUser(User{Username: r.Form.Get("username")})
+	user, err := s.Users.Create(User{Username: r.Form.Get("username")})
 	if err != nil {
 		write(w, errorResp(err))
 		return

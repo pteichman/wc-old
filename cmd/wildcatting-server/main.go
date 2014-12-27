@@ -22,7 +22,12 @@ func main() {
 
 	flag.Parse()
 
-	http.Handle("/", wc.New(*staticdir))
+	s := wc.Storage{
+		Static: *staticdir,
+		Users:  &wc.MemUsers{},
+	}
+
+	http.Handle("/", wc.NewMux(s))
 
 	log.Printf("Listening on http://%s/", *addr)
 	log.Println(http.ListenAndServe(*addr, nil))

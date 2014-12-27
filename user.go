@@ -7,38 +7,41 @@ type User struct {
 	Username string `json:"username"`
 }
 
-var users = []User{User{}}
-
-func exists(name string) bool {
-	_, ok := getUser(name)
-	return ok
+type UserStore interface {
+	Get(name string) (User, error)
+	Create(User) (User, error)
+	Save(User) error
 }
 
-func getUser(name string) (User, bool) {
-	for _, u := range users {
+type MemUsers struct {
+	Users []User
+}
+
+func (m *MemUsers) Get(name string) (User, error) {
+	for _, u := range m.Users {
 		if u.Username == name {
-			return u, true
+			return u, nil
 		}
 	}
 
-	return User{}, false
+	return User{}, ecs.ErrNotFound
 }
 
-func createUser(u User) (User, error) {
+func (m *MemUsers) Create(u User) (User, error) {
 	if u.Id != 0 {
 		return User{}, ecs.ErrHasId
 	}
 
-	if exists(u.Username) {
+	if _, err := m.Get(u.Username); err == nil {
 		return User{}, ecs.ErrExists
 	}
 
-	u.Id = int64(len(users))
-	users = append(users, u)
+	u.Id = int64(len(m.Users))
+	m.Users = append(m.Users, u)
 	return u, nil
 }
 
-func saveUser(u User) User {
-	users[u.Id] = u
-	return u
+func (m *MemUsers) Save(u User) error {
+	m.Users[u.Id] = u
+	return nil
 }
