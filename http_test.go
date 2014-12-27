@@ -72,7 +72,7 @@ func TestTwoUsers(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if user1.Id == user2.Id {
-		t.Fatalf("Expected user1.Id != user2.Id (was %d, %d)", user1.Id, user2.Id)
+	if user1.ID == user2.ID {
+		t.Fatalf("Expected user1.ID != user2.ID (was %d, %d)", user1.ID, user2.ID)
 	}
 }

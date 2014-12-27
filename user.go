@@ -3,7 +3,7 @@ package wc
 import "yasty.org/peter/wc/ecs"
 
 type User struct {
-	Id       int64  `json:"id,string"`
+	ID       int64  `json:"id,string"`
 	Username string `json:"username"`
 }
 
@@ -28,20 +28,20 @@ func (m *MemUsers) Get(name string) (User, error) {
 }
 
 func (m *MemUsers) Create(u User) (User, error) {
-	if u.Id != 0 {
-		return User{}, ecs.ErrHasId
+	if u.ID != 0 {
+		return User{}, ecs.ErrHasID
 	}
 
 	if _, err := m.Get(u.Username); err == nil {
 		return User{}, ecs.ErrExists
 	}
 
-	u.Id = int64(len(m.Users))
+	u.ID = int64(len(m.Users))
 	m.Users = append(m.Users, u)
 	return u, nil
 }
 
 func (m *MemUsers) Save(u User) error {
-	m.Users[u.Id] = u
+	m.Users[u.ID] = u
 	return nil
 }
