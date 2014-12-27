@@ -76,3 +76,41 @@ func TestTwoUsers(t *testing.T) {
 		t.Fatalf("Expected user1.ID != user2.ID (was %d, %d)", user1.ID, user2.ID)
 	}
 }
+
+func TestNewGame(t *testing.T) {
+	s := testServer()
+
+	var user1, user2 *User
+	var err error
+
+	if user1, err = newTestUser(t, s, "Alice"); err != nil {
+		t.Fatal(err)
+	}
+	if user2, err = newTestUser(t, s, "Bob"); err != nil {
+		t.Fatal(err)
+	}
+
+	args := url.Values{"user": []string{user1.Username, user2.Username}}
+
+	req, err := http.NewRequest("GET", "http://wc.com/api/game/new?"+args.Encode(), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	w := httptest.NewRecorder()
+	s.ServeHTTP(w, req)
+
+	var resp = struct {
+		Success bool
+		Error   *string
+		Result  *Game
+	}{}
+
+	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+		t.Fatal(err)
+	}
+
+	if !resp.Success {
+		t.Fatal(errors.New(*resp.Error))
+	}
+}

@@ -61,6 +61,8 @@ func (s Storage) newGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	game.NextWeek()
+
 	write(w, Response{Success: true, Result: game})
 }
 
