@@ -1,0 +1,4 @@
+package wc
+
+func newPlayer() {
+}
