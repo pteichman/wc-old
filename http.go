@@ -3,6 +3,8 @@ package wc
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
+	"strconv"
 )
 
 type Storage struct {
@@ -17,6 +19,9 @@ func NewHandler(s Storage) http.Handler {
 
 	mux.HandleFunc("/api/game/new", s.newGame)
 	mux.HandleFunc("/api/user/new", s.newUser)
+
+	mux.HandleFunc("/api/state", s.state)
+	mux.HandleFunc("/api/move", nil)
 
 	return mux
 }
@@ -80,4 +85,46 @@ func (s Storage) newUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	write(w, Response{Success: true, Result: user})
+}
+
+func getGame(v url.Values) (*Game, error) {
+	gid, err := strconv.ParseInt(v.Get("game"), 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	return &games[gid], nil
+}
+
+type State struct {
+	*Game
+	Moves []string `json:"moves"`
+}
+
+func (s Storage) state(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		write(w, errorResp(err))
+		return
+	}
+
+	g, err := getGame(r.Form)
+	if err != nil {
+		write(w, errorResp(err))
+		return
+	}
+
+	var moves []string
+
+	if name := r.Form.Get("user"); name != "" {
+		// Figure out this user's valid moves.
+		i, _ := g.player(name)
+
+		if g.ToDrill[i] {
+			moves = append(moves, "action=drill&loc=NNNN")
+		} else if g.ToMaintain[i] {
+			// Append a sell move for all the user's wells.
+		}
+	}
+
+	write(w, Response{Success: true, Result: State{Game: g, Moves: moves}})
 }

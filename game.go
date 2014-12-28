@@ -1,5 +1,7 @@
 package wc
 
+import "yasty.org/peter/wc/ecs"
+
 // Game is the serializable form of a Wildcatting game.
 type Game struct {
 	ID       int64  `json:"id,string"`
@@ -12,13 +14,26 @@ type Game struct {
 	// These map player index to whether they've drilled/maintained.
 	ToDrill    []bool `json:"toDrill"`
 	ToMaintain []bool `json:"toMaintain"`
+
+	world *ecs.World
 }
 
 func (g *Game) nextWeek() {
+	g.Tick++
 	g.Week++
 
 	setAll(g.ToDrill, true)
 	setAll(g.ToMaintain, true)
+}
+
+func (g *Game) player(name string) (int, User) {
+	for i, p := range g.Players {
+		if p.Username == name {
+			return i, p
+		}
+	}
+
+	return -1, User{}
 }
 
 func setAll(b []bool, v bool) {

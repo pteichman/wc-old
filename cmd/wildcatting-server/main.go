@@ -27,8 +27,17 @@ func main() {
 		Users:  &wc.MemUsers{},
 	}
 
-	http.Handle("/", wc.NewHandler(s))
+	http.Handle("/", logHandler{wc.NewHandler(s)})
 
 	log.Printf("Listening on http://%s/", *addr)
 	log.Println(http.ListenAndServe(*addr, nil))
+}
+
+type logHandler struct {
+	http.Handler
+}
+
+func (h logHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Printf("%s", r.URL)
+	h.Handler.ServeHTTP(w, r)
 }
