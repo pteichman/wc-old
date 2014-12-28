@@ -10,7 +10,7 @@ type Storage struct {
 	Users  UserStore
 }
 
-func NewMux(s Storage) http.Handler {
+func NewHandler(s Storage) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.Handle("/", http.FileServer(http.Dir(s.Static)))
@@ -61,7 +61,7 @@ func (s Storage) newGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	game.NextWeek()
+	game.nextWeek()
 
 	write(w, Response{Success: true, Result: game})
 }

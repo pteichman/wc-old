@@ -15,7 +15,7 @@ func testServer() http.Handler {
 		Users:  &MemUsers{},
 	}
 
-	return NewMux(s)
+	return NewHandler(s)
 }
 
 func newTestUser(t *testing.T, h http.Handler, username string) (*User, error) {

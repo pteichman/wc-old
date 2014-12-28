@@ -1,0 +1,342 @@
+/* RESET */
+
+html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address,cite,code,del,dfn,em,img,ins,kbd,q,samp,small,strong,sub,sup,var,b,i,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,figcaption,figure,footer,header,hgroup,menu,nav,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}
+body{line-height:1}
+article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}
+nav ul{list-style:none}
+blockquote,q{quotes:none}
+blockquote:before,blockquote:after,q:before,q:after{content:none}
+a{margin:0;padding:0;font-size:100%;vertical-align:baseline;background:transparent}
+ins{background-color:#ff9;color:#000;text-decoration:none}
+mark{background-color:#ff9;color:#000;font-style:italic;font-weight:bold}
+del{text-decoration:line-through}
+abbr[title],dfn[title]{border-bottom:1px dotted;cursor:help}
+table{border-collapse:collapse;border-spacing:0}
+hr{display:block;height:1px;border:0;border-top:1px solid #ccc;margin:1em 0;padding:0}
+input,select{vertical-align:middle}
+:focus{outline:none}
+
+/* FONTS */
+
+@font-face {
+    font-family: 'ScoutCond';
+    src: url(../fonts/scoutcond.ttf) format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'ScoutCond';
+    src: url(../fonts/scoutcond_black.ttf) format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Scout';
+    src: url(../fonts/scout.ttf) format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Scout';
+    src: url(../fonts/scout_black.ttf) format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Scout';
+    src: url(../fonts/scout_light.ttf) format('truetype');
+    font-weight: 200;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Scout';
+    src: url(../fonts/scout_thin.ttf) format('truetype');
+    font-weight: 100;
+    font-style: normal;
+}
+
+/* BASIC */
+
+body {
+    background: #C8C9C1;
+    font-family: Scout;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* BUTTONS */
+
+button {
+    font: 32px/52px ScoutCond;
+    border-radius: 8px;
+    background: #fff;
+    color: #000;
+    border: none;
+    box-shadow: inset 0px -12px 0px 0px rgba(0,0,0,.1);
+    padding: 0 16px 12px;
+}
+
+button:active {
+    box-shadow: inset 0px 12px 0px 0px rgba(0,0,0,.1);
+    padding: 12px 16px 0;
+}
+
+/* GAME VIEW */
+
+.game {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    min-height: 720px;
+    min-width: 960px;
+    overflow: hidden;
+}
+
+/* LOADING */
+.loading {
+    font: 32px/52px ScoutCond;
+    color: rgba(0,0,0,0.5);
+    position: absolute;
+    text-align: center;
+    top: 50%;
+    width: 100%;
+    margin-top: -1em;
+}
+
+/* TURN CONTROLLER */
+
+.turn-controller {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+}
+
+.turn-controller button {
+    width: 128px;
+}
+
+.turn-controller .waiting {
+    background: rgba(0,0,0,.1);
+    color: rgba(0,0,0,0.5);
+    box-shadow: inset 0px 12px 0px 0px rgba(0,0,0,.05);
+    padding: 12px 16px 0;
+}
+
+.turn-controller .pending {
+    background: #F1A002;
+    color: #fff;
+}
+
+.turn-controller .complete {
+    background: #89B41B;
+    color: #fff;
+}
+
+/* BOARD */
+
+.board {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.viewer-side .board {
+    margin-top: -64px;
+}
+
+.opponent-side .board {
+    margin-top: -336px;
+}
+
+/* BADGES */
+
+.badge {
+  position: absolute;
+  left: 16px;
+}
+
+.badge .marker {
+  display: inline-block;
+  width: 56px;
+  height: 56px;
+  background: #555;
+  font: bold 30px/56px Scout;
+  text-align: center;
+  border-radius: 32px;
+  color: #fff;
+}
+
+.badge .label {
+  display: inline-block;
+  margin-left: 16px;
+  color: rgba(0,0,0,0.5);
+  font: 32px/56px ScoutCond;
+  white-space: nowrap;
+}
+
+.opponent-side .badge {
+  top: 16px;
+}
+
+.opponent-side .badge .marker {
+  background: #EF4E26;
+}
+
+.viewer-side .badge {
+  bottom: 16px;
+}
+
+.viewer-side .badge .marker {
+  background: #40ADD1;
+}
+
+/* SPACES */
+
+.space {
+    width: 96px;
+    height: 96px;
+    margin: 112px 16px 48px;
+    background: rgba(0,0,0,.1);
+    box-shadow: inset 0px 8px 0px 0px rgba(0,0,0,.05);
+    border-radius: 8px;
+    display: inline-block;
+}
+
+/* TILES */
+
+.tile {
+    position: absolute;
+    bottom: 48px;
+}
+
+.tile+.tile {
+    bottom: 100px;
+}
+
+.tile .card {
+    position: absolute;
+    left: 104px;
+    top: -50%;
+    opacity: 0;
+    z-index: 99;
+    visibility: hidden;
+    box-shadow: 0px 4px 0px 0px rgba(0,0,0,0.025);
+    -webkit-transform: scale(.1);
+}
+
+.tile:hover .card {
+    visibility: visible;
+    opacity: 1;
+    -webkit-transform: scale(1);
+}
+
+.tile:hover .card:hover {
+    visibility: hidden;
+    opacity: 0;
+    -webkit-transform: scale(.1);
+}
+
+/* STAT BUBBLES */
+
+.stat-bubble {
+    width: 96px;
+    height: 32px;
+    padding: 6px 0;
+    background: url(/img/ui/StatBubble@2x.png) no-repeat;
+    background-size: 96px 42px;
+    position: absolute;
+    bottom: 4px;
+    opacity: 1;
+    transition: all 0.1s ease;
+    color: rgba(0,0,0,0.5);
+    font: 24px/32px ScoutCond;
+    text-align: left;
+}
+
+.slot:hover .stat-bubble {
+    opacity: 1;
+    bottom: 4px;
+}
+
+.stat-bubble span {
+    display: inline-block;
+    padding-left: 32px;
+}
+
+/* CARDS */
+
+.card {
+    transition: all 0.1s ease;
+    border-radius: 8px;
+}
+
+.card img {
+    display: block;
+}
+
+/* HANDS */
+
+.hand {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-left: 192px;
+    margin-right: 192px;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.hand .card {
+    position: relative;
+    display: inline-block;
+    margin-left: -32px;
+    left: 16px;
+    -webkit-transform: scale(.75);
+    box-shadow: 0px 2px 0px 2px rgba(0,0,0,0.05);
+}
+
+.hand-med .card {
+    left: 32px;
+    margin-left: -64px;
+}
+
+.hand-large .card {
+    left: 40px;
+    margin-left: -80px;
+}
+
+.hand-xlarge .card {
+    left: 48px;
+    margin-left: -96px;
+}
+
+.viewer-side .hand .card:hover {
+    -webkit-transform: scale(1);
+    top: -72px;
+    z-index: 99;
+    box-shadow: 0px 64px 0px 8px rgba(0,0,0,0.025);
+}
+
+.viewer-side .hand {
+    bottom: -64px;
+}
+
+.opponent-side .hand {
+    top: -128px;
+}
+
+.opponent-side .hand .card {
+    background: #EF4E26;
+}

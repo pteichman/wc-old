@@ -27,7 +27,7 @@ func main() {
 		Users:  &wc.MemUsers{},
 	}
 
-	http.Handle("/", wc.NewMux(s))
+	http.Handle("/", wc.NewHandler(s))
 
 	log.Printf("Listening on http://%s/", *addr)
 	log.Println(http.ListenAndServe(*addr, nil))
