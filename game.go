@@ -45,12 +45,17 @@ func setAll(b []bool, v bool) {
 var games []Game
 
 func createGame(users []User) (*Game, error) {
+	world := ecs.NewWorld()
+	makeField(world, 5, 5)
+
 	game := Game{
 		ID:         int64(len(games)),
 		Players:    users,
 		NumWeeks:   13,
 		ToDrill:    make([]bool, len(users)),
 		ToMaintain: make([]bool, len(users)),
+
+		world: world,
 	}
 
 	games = append(games, game)

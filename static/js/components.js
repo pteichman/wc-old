@@ -1,11 +1,3 @@
-var imageDensitySuffix = ""
-if (window.devicePixelRatio > 1) {
-    imageDensitySuffix = "@2x";
-};
-if (window.devicePixelRatio > 2) {
-    imageDensitySuffix = "@3x";
-};
-
 var Game = React.createClass({
     loadGameFromServer: function() {
         $.ajax({
@@ -194,6 +186,6 @@ var Badge = React.createClass({
 });
 
 React.render(
-    <Game url="/api/new" />,
+    <Game url="/api/game/new?user=Alice&user=Bob" />,
     document.getElementById("main")
 );

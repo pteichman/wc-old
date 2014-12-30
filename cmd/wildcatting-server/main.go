@@ -27,6 +27,9 @@ func main() {
 		Users:  &wc.MemUsers{},
 	}
 
+	s.Users.Create(wc.User{Username: "Alice"})
+	s.Users.Create(wc.User{Username: "Bob"})
+
 	http.Handle("/", logHandler{wc.NewHandler(s)})
 
 	log.Printf("Listening on http://%s/", *addr)
