@@ -17,16 +17,20 @@ var Game = React.createClass({
         };
     },
     componentDidMount: function() {
-    this.loadGameFromServer();
+        this.loadGameFromServer();
     },
     render: function() {
         if (!this.state.data) {
             return <div className="game"><Loading /></div>;
         }
+
+        var players = this.state.data.result.players;
+
+        console.log(this.state);
         return (
             <div className="game">
-                <Side player={this.state.data.viewer} owner="viewer" />
-                <Side player={this.state.data.opponent} owner="opponent" />
+                <Player username={players[0].username} /> vs <Player username={players[1].username} />
+                <Field />
             </div>
         );
     }
@@ -36,6 +40,27 @@ var Loading = React.createClass({
     render: function() {
         return (
             <div className="loading">Loading...</div>
+        );
+    }
+});
+
+var Player = React.createClass({
+    render: function() {
+        return (
+            <span>{this.props.username}</span>
+        );
+    }
+})
+
+var Field = React.createClass({
+    render: function() {
+        var classes = React.addons.classSet({
+            "field": true,
+        });
+        return (
+            <div className={classes}>
+                <table></table>
+            </div>
         );
     }
 });

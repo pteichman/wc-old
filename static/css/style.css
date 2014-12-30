@@ -1,70 +1,6 @@
-/* RESET */
-
-html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address,cite,code,del,dfn,em,img,ins,kbd,q,samp,small,strong,sub,sup,var,b,i,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,figcaption,figure,footer,header,hgroup,menu,nav,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}
-body{line-height:1}
-article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}
-nav ul{list-style:none}
-blockquote,q{quotes:none}
-blockquote:before,blockquote:after,q:before,q:after{content:none}
-a{margin:0;padding:0;font-size:100%;vertical-align:baseline;background:transparent}
-ins{background-color:#ff9;color:#000;text-decoration:none}
-mark{background-color:#ff9;color:#000;font-style:italic;font-weight:bold}
-del{text-decoration:line-through}
-abbr[title],dfn[title]{border-bottom:1px dotted;cursor:help}
-table{border-collapse:collapse;border-spacing:0}
-hr{display:block;height:1px;border:0;border-top:1px solid #ccc;margin:1em 0;padding:0}
-input,select{vertical-align:middle}
-:focus{outline:none}
-
-/* FONTS */
-
-@font-face {
-    font-family: 'ScoutCond';
-    src: url(../fonts/scoutcond.ttf) format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'ScoutCond';
-    src: url(../fonts/scoutcond_black.ttf) format('truetype');
-    font-weight: bold;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Scout';
-    src: url(../fonts/scout.ttf) format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Scout';
-    src: url(../fonts/scout_black.ttf) format('truetype');
-    font-weight: bold;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Scout';
-    src: url(../fonts/scout_light.ttf) format('truetype');
-    font-weight: 200;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Scout';
-    src: url(../fonts/scout_thin.ttf) format('truetype');
-    font-weight: 100;
-    font-style: normal;
-}
-
-/* BASIC */
-
 body {
-    background: #C8C9C1;
-    font-family: Scout;
+    background: #00FF00;
+    font-family: Bitter;
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
@@ -74,7 +10,7 @@ body {
 /* BUTTONS */
 
 button {
-    font: 32px/52px ScoutCond;
+    font: 32px/52px Bitter;
     border-radius: 8px;
     background: #fff;
     color: #000;
@@ -103,8 +39,8 @@ button:active {
 
 /* LOADING */
 .loading {
-    font: 32px/52px ScoutCond;
-    color: rgba(0,0,0,0.5);
+    font: 32px/52px Bitter;
+    color: rgba(0,0,0,1.0);
     position: absolute;
     text-align: center;
     top: 50%;
@@ -172,7 +108,7 @@ button:active {
   width: 56px;
   height: 56px;
   background: #555;
-  font: bold 30px/56px Scout;
+  font: bold 30px/56px Bitter;
   text-align: center;
   border-radius: 32px;
   color: #fff;
@@ -182,7 +118,7 @@ button:active {
   display: inline-block;
   margin-left: 16px;
   color: rgba(0,0,0,0.5);
-  font: 32px/56px ScoutCond;
+  font: 32px/56px Bitter;
   white-space: nowrap;
 }
 
@@ -261,7 +197,7 @@ button:active {
     opacity: 1;
     transition: all 0.1s ease;
     color: rgba(0,0,0,0.5);
-    font: 24px/32px ScoutCond;
+    font: 24px/32px Bitter;
     text-align: left;
 }
 
