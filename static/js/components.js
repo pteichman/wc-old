@@ -25,10 +25,12 @@ var Game = React.createClass({
         }
 
         var players = this.state.data.result.players;
+        var field = this.state.data.result.field;
+
         return (
             <div className="game">
                 <Player username={players[0].username} /> vs <Player username={players[1].username} />
-                <Field />
+                <Field w="{field.w}" h="{field.h}" sites="{field.sites}"/>
             </div>
         );
     }
@@ -55,9 +57,24 @@ var Field = React.createClass({
         var classes = React.addons.classSet({
             "field": true,
         });
+
+        var rows = [];
+        var sites = [];
+
+        this.props.sites.forEach(function(site) {
+            if (sites.length == this.props.w) {
+                rows.push(<FieldRow sites="{sites}"/>);
+                sites = [];
+            }
+
+            sites.push(site);
+        });
+
         return (
             <div className={classes}>
-                <table></table>
+                <table>
+                    <tbody>{rows}</tbody>
+                </table>
             </div>
         );
     }

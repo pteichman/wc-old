@@ -15,17 +15,18 @@ type point struct {
 type site struct {
 	prob, cost, tax, depth int
 
-	oil bool
+	Oil bool `json:"oil"`
 }
 
 type field struct {
-	w, h  int
-	sites []site
+	W     int `json:"w"`
+	H     int `json:"h"`
+	Sites []site
 }
 
 func makeField(world *ecs.World, w, h int) ecs.Entity {
 	f := newField(w, h)
-	for _, site := range f.sites {
+	for _, site := range f.Sites {
 		world.AddTag(world.NewEntity(), siteTag, site)
 	}
 
@@ -68,29 +69,29 @@ func clamp(v, min, max float64) float64 {
 }
 
 func newField(w, h int) field {
-	f := field{w: w, h: h, sites: make([]site, w*h)}
+	f := field{W: w, H: h, Sites: make([]site, w*h)}
 
 	f.fill(
 		peakSpec{min: 1, max: 5, decay: 0.15, fuzz: 0.15},
-		func(s site, v float64) {
+		func(s *site, v float64) {
 			s.prob = int(100 * v)
-			s.oil = rand.Float64() < v
+			s.Oil = rand.Float64() < v
 		},
 	)
 
 	f.fill(
 		peakSpec{min: 5, max: 10, decay: 0.1, fuzz: 0.25},
-		func(s site, v float64) { s.cost = int(v) },
+		func(s *site, v float64) { s.cost = int(v) },
 	)
 
 	f.fill(
 		peakSpec{min: 1, max: 1, decay: 0.1, fuzz: 0.5},
-		func(s site, v float64) { s.depth = int((1.0 - v) * 10.0) },
+		func(s *site, v float64) { s.depth = int((1.0 - v) * 10.0) },
 	)
 
 	f.fill(
 		peakSpec{min: 10, max: 20, decay: 0.1, fuzz: 0.5},
-		func(s site, v float64) { s.tax = int(v) },
+		func(s *site, v float64) { s.tax = int(v) },
 	)
 
 	return f
@@ -104,17 +105,17 @@ type peakSpec struct {
 	fuzz  float64
 }
 
-func (f field) fill(spec peakSpec, fill func(s site, v float64)) {
-	peaks := randPeaks(randRange(spec.min, spec.max+1), f.w, f.h)
+func (f field) fill(spec peakSpec, fill func(s *site, v float64)) {
+	peaks := randPeaks(randRange(spec.min, spec.max+1), f.W, f.H)
 
-	for y := 0; y < f.h; y++ {
-		for x := 0; x < f.w; x++ {
+	for y := 0; y < f.H; y++ {
+		for x := 0; x < f.W; x++ {
 			// Start with the distance to the nearest peak.
 			v, idx := closestPeak(peaks, point{x, y})
 
 			// Convert to a ratio of the distance to the
 			// longest diagonal distance in the field.
-			v /= dist(point{0, 0}, point{f.w, f.h})
+			v /= dist(point{0, 0}, point{f.W, f.H})
 
 			// Double the value for a better input into
 			// log. :/ This should be distilled to some
@@ -137,7 +138,7 @@ func (f field) fill(spec peakSpec, fill func(s site, v float64)) {
 			// Contain the final value.
 			v = clamp(v, 0.0, 1.0)
 
-			fill(f.sites[x+f.w*y], v)
+			fill(&f.Sites[x+f.W*y], v)
 		}
 	}
 }
@@ -158,14 +159,14 @@ func linkedSites(s []site, w, h int) []link {
 		for x := 0; x < w; x++ {
 			site := s[x+w*y]
 
-			if !site.oil {
+			if !site.Oil {
 				continue
 			}
 
 			// See if we should link to our neighbor above.
 			if y > 0 {
 				up := s[x+w*(y-1)]
-				if up.oil && up.depth == site.depth {
+				if up.Oil && up.depth == site.depth {
 					l := link{point{x, y}, point{x, y - 1}}
 					links = append(links, l)
 				}
@@ -174,7 +175,7 @@ func linkedSites(s []site, w, h int) []link {
 			// See if we should link to our neighbor to the left.
 			if x > 0 {
 				left := s[(x-1)+w*y]
-				if left.oil && left.depth == site.depth {
+				if left.Oil && left.depth == site.depth {
 					l := link{point{x, y}, point{x - 1, y}}
 					links = append(links, l)
 				}
