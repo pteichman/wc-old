@@ -25,8 +25,6 @@ var Game = React.createClass({
         }
 
         var players = this.state.data.result.players;
-
-        console.log(this.state);
         return (
             <div className="game">
                 <Player username={players[0].username} /> vs <Player username={players[1].username} />

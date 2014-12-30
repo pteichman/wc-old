@@ -15,6 +15,8 @@ type Game struct {
 	ToDrill    []bool `json:"toDrill"`
 	ToMaintain []bool `json:"toMaintain"`
 
+	Field field `json:"field"`
+
 	world *ecs.World
 }
 
@@ -46,7 +48,7 @@ var games []Game
 
 func createGame(users []User) (*Game, error) {
 	world := ecs.NewWorld()
-	makeField(world, 5, 5)
+	f := newField(80, 24)
 
 	game := Game{
 		ID:         int64(len(games)),
@@ -54,6 +56,8 @@ func createGame(users []User) (*Game, error) {
 		NumWeeks:   13,
 		ToDrill:    make([]bool, len(users)),
 		ToMaintain: make([]bool, len(users)),
+
+		Field: f,
 
 		world: world,
 	}
