@@ -8,8 +8,8 @@ import (
 )
 
 // point is a coordinate in oilspace.
-type point struct {
-	x, y int
+type Point struct {
+	X, Y int
 }
 
 type site struct {
@@ -33,23 +33,23 @@ func makeField(world *ecs.World, w, h int) ecs.Entity {
 	return world.NewEntity()
 }
 
-func randPeaks(n, w, h int) []point {
-	var peaks []point
+func randPeaks(n, w, h int) []Point {
+	var peaks []Point
 	for i := 0; i < n; i++ {
-		peaks = append(peaks, point{x: rand.Intn(w), y: rand.Intn(h)})
+		peaks = append(peaks, Point{X: rand.Intn(w), Y: rand.Intn(h)})
 	}
 
 	return peaks
 }
 
-func dist(p1, p2 point) float64 {
-	dx := float64(p1.x - p2.x)
-	dy := float64(p1.y - p2.y)
+func dist(p1, p2 Point) float64 {
+	dx := float64(p1.X - p2.X)
+	dy := float64(p1.Y - p2.Y)
 
 	return math.Sqrt(dx*dx + dy*dy)
 }
 
-func closestPeak(peaks []point, p point) (float64, int) {
+func closestPeak(peaks []Point, p Point) (float64, int) {
 	var idx int
 	var min = math.Inf(0)
 
@@ -111,11 +111,11 @@ func (f field) fill(spec peakSpec, fill func(s *site, v float64)) {
 	for y := 0; y < f.H; y++ {
 		for x := 0; x < f.W; x++ {
 			// Start with the distance to the nearest peak.
-			v, idx := closestPeak(peaks, point{x, y})
+			v, idx := closestPeak(peaks, Point{x, y})
 
 			// Convert to a ratio of the distance to the
 			// longest diagonal distance in the field.
-			v /= dist(point{0, 0}, point{f.W, f.H})
+			v /= dist(Point{0, 0}, Point{f.W, f.H})
 
 			// Double the value for a better input into
 			// log. :/ This should be distilled to some
@@ -145,11 +145,11 @@ func (f field) fill(spec peakSpec, fill func(s *site, v float64)) {
 
 type reservoir struct {
 	oil int
-	loc []point
+	loc []Point
 }
 
 type link struct {
-	p, q point
+	p, q Point
 }
 
 func linkedSites(s []site, w, h int) []link {
@@ -167,7 +167,7 @@ func linkedSites(s []site, w, h int) []link {
 			if y > 0 {
 				up := s[x+w*(y-1)]
 				if up.Oil && up.depth == site.depth {
-					l := link{point{x, y}, point{x, y - 1}}
+					l := link{Point{x, y}, Point{x, y - 1}}
 					links = append(links, l)
 				}
 			}
@@ -176,7 +176,7 @@ func linkedSites(s []site, w, h int) []link {
 			if x > 0 {
 				left := s[(x-1)+w*y]
 				if left.Oil && left.depth == site.depth {
-					l := link{point{x, y}, point{x - 1, y}}
+					l := link{Point{x, y}, Point{x - 1, y}}
 					links = append(links, l)
 				}
 			}

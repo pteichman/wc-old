@@ -20,6 +20,30 @@ type Game struct {
 	world *ecs.World
 }
 
+// Site is the public representation of a site.
+type Site struct {
+	Entity ecs.Entity
+
+	*Point  `json:"point"`
+	*Survey `json:"survey"`
+	*Well   `json:"well"`
+}
+
+// Survey is a tag applied to site entities once they've been surveyed
+// as a player.
+type Survey struct {
+	DrillCost int
+	Tax       int
+
+	// Prob is an integer probability 0..100.
+	Prob int8
+}
+
+type Well struct {
+	Marker   rune
+	OilDepth int8
+}
+
 func (g *Game) nextWeek() {
 	g.Tick++
 	g.Week++
