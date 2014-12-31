@@ -29,6 +29,14 @@ func (w *World) AllTags(e Entity) *Tag {
 	return w.tags[e]
 }
 
+func (w *World) ForTagged(tag interface{}, f func(Entity, *Tag)) {
+	for entity, tags := range w.tags {
+		if tags.Value(tag) != nil {
+			f(entity, tags)
+		}
+	}
+}
+
 type Tag struct {
 	next     *Tag
 	key, val interface{}

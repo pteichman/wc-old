@@ -7,27 +7,28 @@ import (
 	"yasty.org/peter/wc/ecs"
 )
 
-// point is a coordinate in oilspace.
-type Point struct {
-	X, Y int
+type OilMap struct {
+	W, H int
+	Locs []Secret
 }
 
-type site struct {
-	prob, cost, tax, depth int
-
-	Oil bool `json:"oil"`
+func (om *OilMap) Loc(x, y int) *Secret {
+	return &om.Locs[x+om.W*y]
 }
 
-type field struct {
-	W     int `json:"w"`
-	H     int `json:"h"`
-	Sites []site
+type Secret struct {
+	Survey
+	Oil      bool
+	OilDepth int8
 }
 
-func makeField(world *ecs.World, w, h int) ecs.Entity {
-	f := newField(w, h)
-	for _, site := range f.Sites {
-		world.AddTag(world.NewEntity(), siteTag, site)
+func makeOilMap(world *ecs.World, w, h int) ecs.Entity {
+	f := newOilMap(w, h)
+	for i, secret := range f.Locs {
+		e := world.NewEntity()
+
+		world.AddTag(e, locTag, Point{X: i % f.W, Y: i / f.H})
+		world.AddTag(e, secretTag, secret)
 	}
 
 	return world.NewEntity()
@@ -68,30 +69,30 @@ func clamp(v, min, max float64) float64 {
 	return math.Min(math.Max(v, min), max)
 }
 
-func newField(w, h int) field {
-	f := field{W: w, H: h, Sites: make([]site, w*h)}
+func newOilMap(w, h int) *OilMap {
+	f := &OilMap{W: w, H: h, Locs: make([]Secret, w*h)}
 
 	f.fill(
 		peakSpec{min: 1, max: 5, decay: 0.15, fuzz: 0.15},
-		func(s *site, v float64) {
-			s.prob = int(100 * v)
+		func(s *Secret, v float64) {
+			s.Prob = int8(100 * v)
 			s.Oil = rand.Float64() < v
 		},
 	)
 
 	f.fill(
 		peakSpec{min: 5, max: 10, decay: 0.1, fuzz: 0.25},
-		func(s *site, v float64) { s.cost = int(v) },
+		func(s *Secret, v float64) { s.DrillCost = int(v) },
 	)
 
 	f.fill(
 		peakSpec{min: 1, max: 1, decay: 0.1, fuzz: 0.5},
-		func(s *site, v float64) { s.depth = int((1.0 - v) * 10.0) },
+		func(s *Secret, v float64) { s.OilDepth = int8((1.0 - v) * 10.0) },
 	)
 
 	f.fill(
 		peakSpec{min: 10, max: 20, decay: 0.1, fuzz: 0.5},
-		func(s *site, v float64) { s.tax = int(v) },
+		func(s *Secret, v float64) { s.Tax = int(v) },
 	)
 
 	return f
@@ -105,17 +106,17 @@ type peakSpec struct {
 	fuzz  float64
 }
 
-func (f field) fill(spec peakSpec, fill func(s *site, v float64)) {
-	peaks := randPeaks(randRange(spec.min, spec.max+1), f.W, f.H)
+func (om *OilMap) fill(spec peakSpec, fill func(s *Secret, v float64)) {
+	peaks := randPeaks(randRange(spec.min, spec.max+1), om.W, om.H)
 
-	for y := 0; y < f.H; y++ {
-		for x := 0; x < f.W; x++ {
+	for y := 0; y < om.H; y++ {
+		for x := 0; x < om.W; x++ {
 			// Start with the distance to the nearest peak.
 			v, idx := closestPeak(peaks, Point{x, y})
 
 			// Convert to a ratio of the distance to the
 			// longest diagonal distance in the field.
-			v /= dist(Point{0, 0}, Point{f.W, f.H})
+			v /= dist(Point{0, 0}, Point{om.W, om.H})
 
 			// Double the value for a better input into
 			// log. :/ This should be distilled to some
@@ -138,7 +139,7 @@ func (f field) fill(spec peakSpec, fill func(s *site, v float64)) {
 			// Contain the final value.
 			v = clamp(v, 0.0, 1.0)
 
-			fill(&f.Sites[x+f.W*y], v)
+			fill(om.Loc(x, y), v)
 		}
 	}
 }
@@ -152,7 +153,7 @@ type link struct {
 	p, q Point
 }
 
-func linkedSites(s []site, w, h int) []link {
+func linkedSites(s []Secret, w, h int) []link {
 	var links []link
 
 	for y := 0; y < h; y++ {
@@ -166,7 +167,7 @@ func linkedSites(s []site, w, h int) []link {
 			// See if we should link to our neighbor above.
 			if y > 0 {
 				up := s[x+w*(y-1)]
-				if up.Oil && up.depth == site.depth {
+				if up.Oil && up.OilDepth == site.OilDepth {
 					l := link{Point{x, y}, Point{x, y - 1}}
 					links = append(links, l)
 				}
@@ -175,7 +176,7 @@ func linkedSites(s []site, w, h int) []link {
 			// See if we should link to our neighbor to the left.
 			if x > 0 {
 				left := s[(x-1)+w*y]
-				if left.Oil && left.depth == site.depth {
+				if left.Oil && left.OilDepth == site.OilDepth {
 					l := link{Point{x, y}, Point{x - 1, y}}
 					links = append(links, l)
 				}

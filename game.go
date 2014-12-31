@@ -15,18 +15,25 @@ type Game struct {
 	ToDrill    []bool `json:"toDrill"`
 	ToMaintain []bool `json:"toMaintain"`
 
-	Field field `json:"field"`
+	Field Field `json:"field"`
 
-	world *ecs.World
+	world  *ecs.World
+	oilMap *OilMap
+}
+
+type Field struct {
+	W     int `json:"w"`
+	H     int `json:"h"`
+	Sites []Site
 }
 
 // Site is the public representation of a site.
 type Site struct {
-	Entity ecs.Entity
+	ID     ecs.Entity `json:"id,string"`
+	Point  `json:"point"`
+	Survey `json:"survey"`
 
-	*Point  `json:"point"`
-	*Survey `json:"survey"`
-	*Well   `json:"well"`
+	*Well `json:"well"`
 }
 
 // Survey is a tag applied to site entities once they've been surveyed
@@ -39,9 +46,15 @@ type Survey struct {
 	Prob int8
 }
 
+// Well is a tag applied to site entities once they've been drilled.
 type Well struct {
 	Marker   rune
 	OilDepth int8
+}
+
+// Point is a coordinate in oilspace.
+type Point struct {
+	X, Y int
 }
 
 func (g *Game) nextWeek() {
@@ -71,9 +84,6 @@ func setAll(b []bool, v bool) {
 var games []Game
 
 func createGame(users []User) (*Game, error) {
-	world := ecs.NewWorld()
-	f := newField(80, 24)
-
 	game := Game{
 		ID:         int64(len(games)),
 		Players:    users,
@@ -81,9 +91,10 @@ func createGame(users []User) (*Game, error) {
 		ToDrill:    make([]bool, len(users)),
 		ToMaintain: make([]bool, len(users)),
 
-		Field: f,
+		Field: Field{W: 80, H: 24},
 
-		world: world,
+		world:  ecs.NewWorld(),
+		oilMap: newOilMap(80, 24),
 	}
 
 	games = append(games, game)

@@ -6,6 +6,7 @@ type tag int
 
 const (
 	taxTag tag = iota
-	posTag
+	locTag
 	siteTag
+	secretTag
 )
