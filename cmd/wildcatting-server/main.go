@@ -16,7 +16,7 @@ func init() {
 
 func main() {
 	var (
-		addr      = flag.String("addr", "localhost:8080", "HTTP bind address")
+		addr      = flag.String("addr", "localhost:20764", "HTTP bind address")
 		staticdir = flag.String("staticdir", "static", "Path to static files")
 	)
 
