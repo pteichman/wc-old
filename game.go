@@ -22,8 +22,7 @@ type Game struct {
 }
 
 type Field struct {
-	W     int `json:"w"`
-	H     int `json:"h"`
+	Size
 	Sites []Site
 }
 
@@ -52,9 +51,27 @@ type Well struct {
 	OilDepth int8
 }
 
+type Size struct {
+	W int `json:"w"`
+	H int `json:"h"`
+}
+
+func (s Size) Point(idx int) Point {
+	return Point{X: idx % s.W, Y: idx / s.W}
+}
+
+func (s Size) Index(x, y int) int {
+	return x + s.W*y
+}
+
+func (s Size) IndexPoint(p Point) int {
+	return p.X + s.W*p.Y
+}
+
 // Point is a coordinate in oilspace.
 type Point struct {
-	X, Y int
+	X int `json:"x"`
+	Y int `json:"y"`
 }
 
 func (g *Game) nextWeek() {
@@ -84,6 +101,17 @@ func setAll(b []bool, v bool) {
 var games []Game
 
 func createGame(users []User) (*Game, error) {
+	size := Size{W: 5, H: 5}
+
+	world := ecs.NewWorld()
+	oilMap := newOilMap(size)
+
+	for i, secret := range oilMap.Locs {
+		e := world.NewEntity()
+		world.AddTag(e, locTag, Point{X: i % size.W, Y: i / size.H})
+		world.AddTag(e, secretTag, secret)
+	}
+
 	game := Game{
 		ID:         int64(len(games)),
 		Players:    users,
@@ -91,10 +119,10 @@ func createGame(users []User) (*Game, error) {
 		ToDrill:    make([]bool, len(users)),
 		ToMaintain: make([]bool, len(users)),
 
-		Field: Field{W: 80, H: 24},
+		Field: Field{Size: size},
 
-		world:  ecs.NewWorld(),
-		oilMap: newOilMap(80, 24),
+		world:  world,
+		oilMap: oilMap,
 	}
 
 	games = append(games, game)

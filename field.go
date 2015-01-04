@@ -3,35 +3,22 @@ package wc
 import (
 	"math"
 	"math/rand"
-
-	"yasty.org/peter/wc/ecs"
 )
 
 type OilMap struct {
-	W, H int
+	Size
 	Locs []Secret
 }
 
 func (om *OilMap) Loc(x, y int) *Secret {
-	return &om.Locs[x+om.W*y]
+	return &om.Locs[om.Index(x, y)]
 }
 
 type Secret struct {
 	Survey
-	Oil      bool
-	OilDepth int8
-}
-
-func makeOilMap(world *ecs.World, w, h int) ecs.Entity {
-	f := newOilMap(w, h)
-	for i, secret := range f.Locs {
-		e := world.NewEntity()
-
-		world.AddTag(e, locTag, Point{X: i % f.W, Y: i / f.H})
-		world.AddTag(e, secretTag, secret)
-	}
-
-	return world.NewEntity()
+	Oil       bool
+	OilDepth  int8
+	Reservoir *reservoir
 }
 
 func randPeaks(n, w, h int) []Point {
@@ -69,33 +56,43 @@ func clamp(v, min, max float64) float64 {
 	return math.Min(math.Max(v, min), max)
 }
 
-func newOilMap(w, h int) *OilMap {
-	f := &OilMap{W: w, H: h, Locs: make([]Secret, w*h)}
+func newOilMap(s Size) *OilMap {
+	m := &OilMap{Size: s, Locs: make([]Secret, s.W*s.H)}
 
-	f.fill(
+	m.fill(
 		peakSpec{min: 1, max: 5, decay: 0.15, fuzz: 0.15},
 		func(s *Secret, v float64) {
 			s.Prob = int8(100 * v)
 			s.Oil = rand.Float64() < v
+
+			if s.Oil {
+				s.Reservoir = &reservoir{oil: int(math.Max(0.1, gauss(1, 1)) * 666)}
+			}
 		},
 	)
 
-	f.fill(
+	m.fill(
 		peakSpec{min: 5, max: 10, decay: 0.1, fuzz: 0.25},
 		func(s *Secret, v float64) { s.DrillCost = int(v) },
 	)
 
-	f.fill(
+	m.fill(
 		peakSpec{min: 1, max: 1, decay: 0.1, fuzz: 0.5},
 		func(s *Secret, v float64) { s.OilDepth = int8((1.0 - v) * 10.0) },
 	)
 
-	f.fill(
+	m.fill(
 		peakSpec{min: 10, max: 20, decay: 0.1, fuzz: 0.5},
 		func(s *Secret, v float64) { s.Tax = int(v) },
 	)
 
-	return f
+	m.mergeReservoirs()
+
+	return m
+}
+
+func gauss(mu, sigma float64) float64 {
+	return rand.NormFloat64()*sigma + mu
 }
 
 type peakSpec struct {
@@ -146,43 +143,35 @@ func (om *OilMap) fill(spec peakSpec, fill func(s *Secret, v float64)) {
 
 type reservoir struct {
 	oil int
-	loc []Point
 }
 
-type link struct {
-	p, q Point
+func merge(a, b *reservoir) *reservoir {
+	return &reservoir{oil: a.oil + b.oil}
 }
 
-func linkedSites(s []Secret, w, h int) []link {
-	var links []link
-
-	for y := 0; y < h; y++ {
-		for x := 0; x < w; x++ {
-			site := s[x+w*y]
-
+func (om *OilMap) mergeReservoirs() {
+	for y := 0; y < om.H-1; y++ {
+		for x := 0; x < om.W-1; x++ {
+			site := om.Loc(x, y)
 			if !site.Oil {
 				continue
 			}
 
-			// See if we should link to our neighbor above.
-			if y > 0 {
-				up := s[x+w*(y-1)]
-				if up.Oil && up.OilDepth == site.OilDepth {
-					l := link{Point{x, y}, Point{x, y - 1}}
-					links = append(links, l)
-				}
+			// See if we should link to our neighbor to the right.
+			rt := om.Loc(x+1, y)
+			if rt.Oil && rt.OilDepth == site.OilDepth {
+				r := merge(site.Reservoir, rt.Reservoir)
+				rt.Reservoir = r
+				site.Reservoir = r
 			}
 
-			// See if we should link to our neighbor to the left.
-			if x > 0 {
-				left := s[(x-1)+w*y]
-				if left.Oil && left.OilDepth == site.OilDepth {
-					l := link{Point{x, y}, Point{x - 1, y}}
-					links = append(links, l)
-				}
+			// See if we should link to our neighbor to the bottom.
+			dn := om.Loc(x, y+1)
+			if dn.Oil && dn.OilDepth == site.OilDepth {
+				r := merge(site.Reservoir, dn.Reservoir)
+				dn.Reservoir = r
+				site.Reservoir = r
 			}
 		}
 	}
-
-	return links
 }
