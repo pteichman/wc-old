@@ -48,6 +48,21 @@ button:active {
     margin-top: -1em;
 }
 
+.field {
+    background-color: #00FF00;
+    border-collapse: separate;
+    border-spacing: 1px;
+}
+
+.site {
+    background-color: black;
+}
+
+
+
+
+
+
 /* TURN CONTROLLER */
 
 .turn-controller {

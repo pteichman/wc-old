@@ -23,7 +23,7 @@ type Game struct {
 
 type Field struct {
 	Size
-	Sites []Site
+	Sites []Site `json:"sites"`
 }
 
 // Site is the public representation of a site.
@@ -101,7 +101,7 @@ func setAll(b []bool, v bool) {
 var games []Game
 
 func createGame(users []User) (*Game, error) {
-	size := Size{W: 5, H: 5}
+	size := Size{W: 80, H: 24}
 
 	world := ecs.NewWorld()
 	oilMap := newOilMap(size)
@@ -119,7 +119,7 @@ func createGame(users []User) (*Game, error) {
 		ToDrill:    make([]bool, len(users)),
 		ToMaintain: make([]bool, len(users)),
 
-		Field: Field{Size: size},
+		Field: Field{Size: size, Sites: make([]Site, 0)},
 
 		world:  world,
 		oilMap: oilMap,

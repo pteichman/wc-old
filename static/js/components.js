@@ -30,7 +30,7 @@ var Game = React.createClass({
         return (
             <div className="game">
                 <Player username={players[0].username} /> vs <Player username={players[1].username} />
-                <Field w="{field.w}" h="{field.h}" sites="{field.sites}"/>
+                <Field w={field.w} h={field.h} sites={field.sites}/>
             </div>
         );
     }
@@ -59,23 +59,46 @@ var Field = React.createClass({
         });
 
         var rows = [];
-        var sites = [];
+        for (var i=0; i<this.props.h; i++) {
+            var row = [];
 
-        this.props.sites.forEach(function(site) {
-            if (sites.length == this.props.w) {
-                rows.push(<FieldRow sites="{sites}"/>);
-                sites = [];
+            for (var j=0; j<this.props.w; j++) {
+                row.push(<Site key={j}/>);
             }
 
-            sites.push(site);
-        });
+            rows.push(<FieldRow sites={row} key={i}/>);
+        }
 
         return (
-            <div className={classes}>
-                <table>
+            <div>
+                <table className={classes}>
                     <tbody>{rows}</tbody>
                 </table>
             </div>
+        );
+    }
+});
+
+var FieldRow = React.createClass({
+    render: function() {
+        var classes = React.addons.classSet({
+            "fieldRow": true,
+        });
+
+        return (
+            <tr className={classes}>{this.props.sites}</tr>
+        );
+    }
+});
+
+var Site = React.createClass({
+    render: function() {
+        var classes = React.addons.classSet({
+            "site": true,
+        });
+
+        return (
+            <td className={classes} width="20" height="20"></td>
         );
     }
 });
