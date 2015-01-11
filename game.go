@@ -119,7 +119,7 @@ func createGame(users []User) (*Game, error) {
 		ToDrill:    make([]bool, len(users)),
 		ToMaintain: make([]bool, len(users)),
 
-		Field: Field{Size: size, Sites: make([]Site, 0)},
+		Field: Field{Size: size, Sites: []Site{}},
 
 		world:  world,
 		oilMap: oilMap,

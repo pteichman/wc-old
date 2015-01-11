@@ -2,6 +2,7 @@ package wc
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -46,6 +47,11 @@ func write(w http.ResponseWriter, r Response) {
 	w.Write([]byte("\n"))
 }
 
+type newGameResp struct {
+	ID    int64  `json:"id,string"`
+	State string `json:"state"`
+}
+
 func (s Storage) newGame(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -68,7 +74,12 @@ func (s Storage) newGame(w http.ResponseWriter, r *http.Request) {
 
 	game.nextWeek()
 
-	write(w, Response{Success: true, Result: game})
+	resp := newGameResp{
+		ID:    game.ID,
+		State: fmt.Sprintf("/api/state?game=%d&user=Alice", game.ID),
+	}
+
+	write(w, Response{Success: true, Result: resp})
 }
 
 func (s Storage) newUser(w http.ResponseWriter, r *http.Request) {

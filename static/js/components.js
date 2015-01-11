@@ -248,7 +248,14 @@ var Badge = React.createClass({
     }
 });
 
-React.render(
-    <Game url="/api/game/new?user=Alice&user=Bob" />,
-    document.getElementById("main")
-);
+$.ajax({
+    url: "/api/game/new?user=Alice&user=Bob",
+    dataType: 'json',
+    success: function(data) {
+        var resp = data.result;
+        React.render(<Game url={resp.state} />, document.getElementById("main"));
+    }.bind(this),
+    error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+    }.bind(this)
+});
