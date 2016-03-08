@@ -3,7 +3,7 @@ package wc
 import (
 	"math/rand"
 
-	"yasty.org/peter/wc/ecs"
+	"github.com/pteichman/wc-old/ecs"
 )
 
 type taxFiller struct {

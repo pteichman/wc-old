@@ -1,6 +1,6 @@
 package wc
 
-import "yasty.org/peter/wc/ecs"
+import "github.com/pteichman/wc-old/ecs"
 
 // Game is the serializable form of a Wildcatting game.
 type Game struct {

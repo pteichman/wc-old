@@ -1,6 +1,6 @@
 package wc
 
-import "yasty.org/peter/wc/ecs"
+import "github.com/pteichman/wc-old/ecs"
 
 type User struct {
 	ID       int64  `json:"id,string"`

@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"yasty.org/peter/wc"
+	wc "github.com/pteichman/wc-old"
 )
 
 func init() {
